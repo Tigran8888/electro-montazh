@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Էլեկտրոմոնտաժ</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .call-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: green; color: white; text-decoration: none; font-size: 18px; }
+        .photo-grid img { width: 150px; margin: 10px; border: 1px solid #ddd; }
+        #photo-gallery { display: none; }
+        #preview { margin-top: 20px; }
+        #preview img { width: 150px; margin: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+    <h1>Էլեկտրոմոնտաժ</h1>
+    <p>Բարձրորակ էլեկտրոմոնտաժային ծառայություններ</p>
+    <a href="tel:+79990000000" class="call-btn">Զանգել</a>
+
+    <h2>Մեր աշխատանքները</h2>
+    <form id="uploadForm" action="" method="post" enctype="multipart/form-data">
+        <input type="file" name="photo" id="fileInput" onchange="previewImage()">
+        <button type="submit">Ներբեռնել լուսանկար</button>
+    </form>
+
+    <!-- Предпросмотр изображения перед загрузкой -->
+    <div id="preview"></div>
+
+    <button onclick="toggleGallery()">Ցույց տալ/Հեռացնել պատկերասրահը</button>
+
+    <!-- Галерея изображений -->
+    <div id="photo-gallery">
+        <?php
+        $uploadDir = "uploads/";
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["photo"])) {
+            $fileName = basename($_FILES["photo"]["name"]);
+            $targetFile = $uploadDir . $fileName;
+            move_uploaded_file($_FILES["photo"]["tmp_name"], $targetFile);
+        }
+
+        echo '<div class="photo-grid">';
+        $files = glob($uploadDir . "*.*");
+        foreach ($files as $file) {
+            echo "<img src='$file' alt='Լուսանկար'>";
+        }
+        echo '</div>';
+        ?>
+    </div>
+
+    <script>
+        // Функция для предпросмотра изображения перед загрузкой
+        function previewImage() {
+            const fileInput = document.getElementById('fileInput');
+            const previewDiv = document.getElementById('preview');
+            previewDiv.innerHTML = '';  // Очистить предыдущие изображения
+
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    previewDiv.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Функция для показа/скрытия галереи
+        function toggleGallery() {
+            const gallery = document.getElementById('photo-gallery');
+            gallery.style.display = (gallery.style.display === 'none' || gallery.style.display === '') ? 'block' : 'none';
+        }
+    </script>
+
+</body>
+</html>
